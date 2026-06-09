@@ -267,21 +267,24 @@ const panzoom = Panzoom(popupImg,{
 popupImg.addEventListener('panzoomzoom', () => {
     const scale = panzoom.getScale();
 
-    if(scale > 1){
-        panzoom.setOptions({ disablePan:false });
-    }else{
-        panzoom.setOptions({ disablePan:true });
-    }
-});
-
-popupImg.addEventListener('panzoomzoom', () => {
-    const scale = panzoom.getScale();
-
     if(scale <= 1.05){
         panzoom.reset();
         panzoom.setOptions({ disablePan:true });
     }else{
         panzoom.setOptions({ disablePan:false });
+    }
+});
+
+popupImg.parentElement.addEventListener('wheel', panzoom.zoomWithWheel);
+
+document.querySelectorAll(".gallery img").forEach(img=>{
+    img.onclick=()=>{
+        popup.style.display="flex";
+        popupImg.src=img.src;
+
+        panzoom.reset();
+
+        history.pushState({popup:true},"");
     }
 });
 
