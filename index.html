@@ -18,6 +18,20 @@ body{
 background:#f3f4f6;
 }
 
+#close-popup{
+position:absolute;
+top:20px;
+right:20px;
+width:50px;
+height:50px;
+border:none;
+border-radius:50%;
+background:rgba(255,255,255,.2);
+color:white;
+font-size:32px;
+cursor:pointer;
+z-index:10000;
+}
 
 .header{ 
 background:linear-gradient(135deg,#111,#444);
@@ -82,10 +96,11 @@ font-weight:bold;
 width:100%;
 aspect-ratio:1/1;
 object-fit:cover;
+display:block;
 border-radius:18px;
 cursor:pointer;
 transition:.3s;
-box-shadow:0 4px 12px rgba(0, 0, 0, 0.12);
+box-shadow:0 4px 12px rgba(0,0,0,.12);
 }
 
 .gallery img:hover{
@@ -132,7 +147,9 @@ z-index:9999;
 max-width:95%;
 max-height:95%;
 border-radius:15px;
-touch-action:manipulation;
+touch-action:none;
+display:block;
+margin:auto;
 }
 
 
@@ -229,33 +246,51 @@ touch-action:manipulation;
 </a>
 
 <div id="popup">
+<button id="close-popup">×</button>
 <img id="popup-img">
 </div>
 
 <script>
-const popup=document.getElementById("popup");
-const popupImg=document.getElementById("popup-img");
+ document.getElementById("close-popup").addEventListener("click", () => {
+    popup.style.display = "none";
+    panzoom.reset();
+}); 
+const popup = document.getElementById("popup");
+const popupImg = document.getElementById("popup-img");
+
+const panzoom = Panzoom(popupImg,{
+    maxScale:5,
+    minScale:1,
+    disablePan:true
+});
+
+popupImg.addEventListener('panzoomzoom', () => {
+    const scale = panzoom.getScale();
+
+    if(scale > 1){
+        panzoom.setOptions({ disablePan:false });
+    }else{
+        panzoom.setOptions({ disablePan:true });
+    }
+});
+
+popupImg.parentElement.addEventListener('wheel', panzoom.zoomWithWheel);
 
 document.querySelectorAll(".gallery img").forEach(img=>{
-img.onclick=()=>{
-popup.style.display="flex";
-popupImg.src=img.src;
+    img.onclick=()=>{
+        popup.style.display="flex";
+        popupImg.src=img.src;
 
-history.pushState({popup:true},"");
-}
+        panzoom.reset();
+
+        history.pushState({popup:true},"");
+    }
 });
 
 window.addEventListener("popstate",()=>{
-if(popup.style.display==="flex"){
-popup.style.display="none";
-}
-});
-
-popup.onclick=()=>{
-popup.style.display="none";
-} 
-Panzoom(popupImg,{
-maxScale:4
+    if(popup.style.display==="flex"){
+        popup.style.display="none";
+    }
 });
 
 </script>
