@@ -274,16 +274,14 @@ popupImg.addEventListener('panzoomzoom', () => {
     }
 });
 
-popupImg.parentElement.addEventListener('wheel', panzoom.zoomWithWheel);
+popupImg.addEventListener('panzoomzoom', () => {
+    const scale = panzoom.getScale();
 
-document.querySelectorAll(".gallery img").forEach(img=>{
-    img.onclick=()=>{
-        popup.style.display="flex";
-        popupImg.src=img.src;
-
+    if(scale <= 1.05){
         panzoom.reset();
-
-        history.pushState({popup:true},"");
+        panzoom.setOptions({ disablePan:true });
+    }else{
+        panzoom.setOptions({ disablePan:false });
     }
 });
 
